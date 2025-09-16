@@ -1,0 +1,161 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
+import { Pagination } from 'antd';
+
+// import Badge from "../../components/ui/badge/Badge";
+import { Eye } from "lucide-react";
+
+import {
+  ModuleRegistry
+} from "ag-grid-community";
+import { AllEnterpriseModule } from "ag-grid-enterprise";
+import { useNavigate } from "react-router";
+
+
+interface User {
+  id: number;
+  businessName: string;
+  couponName: string;
+  couponCode: string;
+  startDate: string;
+  endDate: string;
+}
+
+// Define the table data using the interface
+const tableData: User[] = [
+  {
+    id: 1,
+    businessName: "abc",
+    couponName: "pwn23",
+    couponCode: "1324",
+    startDate: "2023-10-01",
+    endDate: "2023-10-31",
+  },
+  {
+    id: 2,
+    businessName: "abc",
+    couponName: "pwn23",
+    couponCode: "1324",
+    startDate: "2023-10-01",
+    endDate: "2023-10-31",
+  },
+
+  
+];
+
+ModuleRegistry.registerModules([AllEnterpriseModule]);
+
+const UserManagement = () => {
+  const navigate = useNavigate();
+
+  // const handleView = (id: number) => {
+  //     navigate(`/user-management/${id}`);
+  // };
+
+
+  return (
+    <>
+      <h1 className="text-2xl font-bold uppercase">Coupon MANAGEMENT</h1>
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+        <div className="max-w-full overflow-x-auto py-4">
+          <Table>
+            {/* Table Header */}
+            <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+              <TableRow>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  S.No
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Business Name
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Coupon Name
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Coupon Code
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Start Date
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  End Date
+                </TableCell>
+                <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHeader>
+
+            {/* Table Body */}
+            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+              {tableData.map((user, index) => (
+                <TableRow key={user.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    #{index + 1}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {user.businessName}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {user.couponName}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {user.couponCode}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {user.startDate}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {user.endDate}
+                  </TableCell>
+
+                  {/* New Action Column */}
+                  <TableCell className="px-4 py-3 text-center">
+                    <button
+                      onClick={() => navigate(`/coupon-management/${user.id}`)}
+                      className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10"
+                      title="View Details"
+                    >
+                      <Eye size={18} className="text-gray-600 dark:text-gray-300" />
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="p-4">
+          <Pagination align="end" defaultCurrent={1} total={50} />
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+
+export default UserManagement;
