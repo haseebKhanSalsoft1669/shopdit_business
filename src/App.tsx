@@ -115,7 +115,7 @@ const routesConfig: RouteConfig[] = [
 export default function App() {
   return (
     <>
-      <Router>
+      <Router basename="/shopdit-business">
         <ScrollToTop />
         <Routes>
           <Route element={<AppLayout />}>
