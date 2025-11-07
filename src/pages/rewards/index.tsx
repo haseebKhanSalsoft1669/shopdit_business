@@ -1,3 +1,4 @@
+import { Pagination } from 'antd';
 import {
     Table,
     TableBody,
@@ -5,10 +6,8 @@ import {
     TableHeader,
     TableRow,
 } from "../../components/ui/table";
-import { Pagination } from 'antd';
 
 // import Badge from "../../components/ui/badge/Badge";
-import { Eye } from "lucide-react";
 
 import {
     ModuleRegistry
