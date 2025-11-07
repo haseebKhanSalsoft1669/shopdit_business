@@ -116,7 +116,7 @@ export default function StatisticsChart() {
       <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
         <div className="w-full">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-          Coupons Performance
+         Points Earned Over Time
           </h3>
           
         </div>
