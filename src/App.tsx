@@ -37,6 +37,15 @@ import BusinessDetails from "./pages/BusinessManagement/businessDetails";
 import Events from "./pages/events";
 
 import MyCollaboration from "./pages/myCollaboration";
+import CampaignAnalytics from "./pages/campaignAnalytics/indesx";
+import Rewards from "./pages/rewards";
+import Customer from "./pages/customer";
+import ProductListing from "./pages/productListing";
+import OrderManagement from "./pages/orderManagement";
+import OrderDetails from "./pages/orderManagement/orderDetails";
+import AddReward from "./pages/rewards/addReward";
+import AddProduct from "./pages/productListing/addProduct";
+import AddCustomer from "./pages/customer/addCustomer";
 
 
 interface RouteConfig {
@@ -106,6 +115,62 @@ const routesConfig: RouteConfig[] = [
   {
     path: "/campaign-management/:id",
     element: <ViewCampaign />,
+    // roles: "all",
+    title: "Campaign Management"
+  },
+  {
+    path: "/analytics",
+    element: <CampaignAnalytics/>,
+    // roles: "all",
+    title: "Analytics"
+  },
+
+   {
+    path: "/rewards",
+    element: <Rewards/>,
+    // roles: "all",
+    title: "Rewards"
+  },
+  {
+    path: "/add-reward",
+    element: <AddReward/>,
+    // roles: "all",
+    title: "Add Rewards"
+  },
+   {
+    path: "/customer",
+    element: <Customer/>,
+    // roles: "all",
+    title: "Customer"
+  },
+   {
+    path: "/add-customer",
+    element: <AddCustomer/>,
+    // roles: "all",
+    title: "Add Customer"
+  },
+   {
+    path: "/product-listing",
+    element: <ProductListing/>,
+    // roles: "all",
+    title: "Product Listing"
+  },
+  {
+    path: "/add-product",
+    element: <AddProduct/>,
+    // roles: "all",
+    title: "Add Product"
+  },
+
+  {
+    path: "/order-management",
+    element: <OrderManagement/>,
+    // roles: "all",
+    title: "Order Management"
+  },
+  {
+    path: "/order-management/:id",
+    element: <OrderDetails />,
     // roles: "all",
     title: "Campaign Management"
   },

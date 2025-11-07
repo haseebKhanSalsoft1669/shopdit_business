@@ -22,6 +22,7 @@ import {
   PieChartIcon,
   PlugInIcon
 } from "../icons";
+import { CircleArrowOutUpRight, CircleStar, UsersRound } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -58,6 +59,34 @@ const navItems: NavItem[] = [
     icon: <MdOutlineCampaign />,
     name: "Campaign Management",
     path: "/campaign-management",
+  },
+
+   {
+    icon: <CircleArrowOutUpRight />,
+    name: "Analytics",
+    path: "/analytics",
+  },
+
+  {
+    icon: <CircleStar/>,
+    name: "Rewards",
+    path: "/rewards",
+  },
+  {
+    icon: <UsersRound/>,
+    name: "Customer",
+    path: "/customer",
+  },
+  {
+    icon: <UsersRound/>,
+    name: "Product Listing",
+    path: "/product-listing",
+  },
+
+  {
+    icon: <UsersRound/>,
+    name: "Order Management",
+    path: "/order-management",
   },
 
 
