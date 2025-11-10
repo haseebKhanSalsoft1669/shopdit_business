@@ -1,39 +1,31 @@
 const { hostname } = window.location;
+
 const servers = {
-  local: "http://localhost:3032",
-  customDev: "https://react.customdev.solutions:3032",
+  local: "http://localhost:3011",
+  customDev: "https://react.customdev.solutions:3011",
   live: "",
-  live_test: "",
-  testing: "https://ldn26m62-3032.inc1.devtunnels.ms",
+  dummy: "https://9d2f-204-157-158-10.ngrok-free.app",
 };
+
 let URL;
-let publicUrl = "/";
-type Environment =
-  | "development"
-  | "customdev"
-  | "live"
-  | "testing"
-  | "live_test";
+
+type Environment = "development" | "customdev" | "live";
+
 let enviroment: Environment = "development";
+
+let publicUrl = "/";
+
 if (hostname.includes("react.customdev.solutions")) {
   URL = servers.customDev;
-  publicUrl = "/shopdit-business";
-  enviroment = "customdev";
-} else if (hostname.includes("m")) {
-  URL = servers.live_test;
-  enviroment = "live_test";
-} else if (hostname.includes("v")) {
-  URL = servers.live;
-  enviroment = "live";
-} else if (hostname.includes("devtunnels.ms")) {
-  URL = servers.testing;
-  enviroment = "testing";
-} else {
+} else if (hostname.includes("localhost")) {
   URL = servers.local;
-  enviroment = "development";
+} else if (hostname.includes("devtunnels.ms")) {
+  URL = servers.dummy;
+} else {
+  URL = servers.live;
 }
+
 export const SOCKET_URL = URL;
-export const STATIC_URL = servers.live + "/Uploads/static/";
 export const UPLOADS_URL = `${URL}/`;
 export const BASE_URL = `${URL}/api`;
 export const PUBLIC_URL = publicUrl;

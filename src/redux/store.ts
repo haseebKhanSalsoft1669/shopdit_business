@@ -1,36 +1,39 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { setupListeners } from '@reduxjs/toolkit/query';
-import { combineReducers } from 'redux';
-import { persistReducer, persistStore } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-import { authSlice } from './services/authSlice';
-import { productSlice } from './services/productSlice';
-import { userSlice } from './services/userSlice';
-import counterReducer from './slices/counterSlice';
-import { reportSlice } from './services/reportSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import { setupListeners } from "@reduxjs/toolkit/query";
+import { combineReducers } from "redux";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+
+import { authService } from "./services/authSlice";
+import { userSlice } from "./services/userSlice";
+import { reportSlice } from "./services/reportSlice";
+import authReducer from "./slices/authSlice";
 
 const persistConfig = {
-    key: 'real_money_admin',
-    storage,
-    whitelist: ['counter', 'userSlice'], // what to persist
+  key: "shopdit_business",
+  storage,
+  whitelist: ["counter", "userSlice", "auth"],
 };
 
 const rootReducer = combineReducers({
-    [authSlice.reducerPath]: authSlice.reducer,
-    [productSlice.reducerPath]: productSlice.reducer,
-    [userSlice.reducerPath]: userSlice.reducer,
-    [reportSlice.reducerPath]: reportSlice.reducer,
-    counter: counterReducer,
+  [authService.reducerPath]: authService.reducer,
+  [userSlice.reducerPath]: userSlice.reducer,
+  [reportSlice.reducerPath]: reportSlice.reducer,
+  auth: authReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-    reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: false,
-        }).concat(authSlice.middleware, productSlice.middleware, userSlice.middleware, reportSlice.middleware),
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }).concat(
+      authService.middleware,
+      userSlice.middleware,
+      reportSlice.middleware
+    ),
 });
 
 setupListeners(store.dispatch);
