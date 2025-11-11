@@ -7,59 +7,25 @@ import {
 } from "../../components/ui/table";
 import { Pagination } from "antd";
 import { useNavigate } from "react-router";
-import {
-  ModuleRegistry
-} from "ag-grid-community";
+import { ModuleRegistry } from "ag-grid-community";
 import { AllEnterpriseModule } from "ag-grid-enterprise";
-
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  sku: string;
-  price: string;
-  stock: string;
-  status: string;
-  addedOn: string;
-}
-
-const tableData: Product[] = [
-  {
-    id: 1,
-    name: "Wireless Headphones",
-    category: "Electronics",
-    sku: "WH-12345",
-    price: "$99.99",
-    stock: "150",
-    status: "Active",
-    addedOn: "2025-10-20",
-  },
-  {
-    id: 2,
-    name: "Smart Watch",
-    category: "Wearables",
-    sku: "SW-98765",
-    price: "$149.50",
-    stock: "320",
-    status: "Active",
-    addedOn: "2025-09-30",
-  },
-  {
-    id: 3,
-    name: "Bluetooth Speaker",
-    category: "Audio",
-    sku: "BS-33221",
-    price: "$59.99",
-    stock: "90",
-    status: "Out of Stock",
-    addedOn: "2025-09-25",
-  },
-];
+import { useSelector } from "react-redux";
+import { useGetBusinessProductsQuery } from "../../redux/services/productService";
 
 ModuleRegistry.registerModules([AllEnterpriseModule]);
 
 const ProductListing = () => {
   const navigate = useNavigate();
+  const { user } = useSelector((state: any) => state.auth);
+  const businessProfileId = user?.activeProfile;
+  const { data, isLoading, error } = useGetBusinessProductsQuery({
+    businessProfileId,
+  });
+
+  if (isLoading) return <>Loading...</>;
+  if (error) return <>Failed to load products</>;
+  console.log(data);
+  const products = data?.data?.docs || []; // assuming your API returns { data: [...] }
 
   return (
     <>
@@ -92,18 +58,7 @@ const ProductListing = () => {
                 >
                   Product Name
                 </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                >
-                  Category
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                >
-                  SKU
-                </TableCell>
+
                 <TableCell
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
@@ -114,13 +69,13 @@ const ProductListing = () => {
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                 >
-                  Stock
+                  Description
                 </TableCell>
                 <TableCell
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                 >
-                  Status
+                  Reward Points
                 </TableCell>
                 <TableCell
                   isHeader
@@ -133,31 +88,25 @@ const ProductListing = () => {
 
             {/* Table Body */}
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {tableData.map((product, index) => (
-                <TableRow key={product.id}>
+              {products.map((product: any, index: number) => (
+                <TableRow key={product.id || index}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
                     #{index + 1}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {product.name}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {product.category}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {product.sku}
+                    {product.productName}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
                     {product.price}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {product.stock}
+                    {product.description}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {product.status}
+                    {product.rewardPoints}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {product.addedOn}
+                    {new Date(product.createdAt).toLocaleDateString() || "-"}
                   </TableCell>
                 </TableRow>
               ))}
@@ -166,7 +115,7 @@ const ProductListing = () => {
         </div>
 
         <div className="p-4">
-          <Pagination align="end" defaultCurrent={1} total={50} />
+          <Pagination align="end" defaultCurrent={1} total={products.length} />
         </div>
       </div>
     </>

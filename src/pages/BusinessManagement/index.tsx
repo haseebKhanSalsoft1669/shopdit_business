@@ -5,54 +5,32 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
-import { Pagination } from 'antd';
-
-// import Badge from "../../components/ui/badge/Badge";
+import { Pagination } from "antd";
 import { Eye } from "lucide-react";
-
-import {
-  ModuleRegistry
-} from "ag-grid-community";
+import { ModuleRegistry } from "ag-grid-community";
 import { AllEnterpriseModule } from "ag-grid-enterprise";
 import { useNavigate } from "react-router";
-
-
-interface User {
-  id: number;
-  businessName: string;
-  userName: string;
-  emailAddress: string;
-  registrationDate: string;
-  // status: string;
-}
-
-// Define the table data using the interface
-const tableData: User[] = [
-  {
-    id: 1,
-    businessName: "ABC Business",
-    userName: "James Anderson",
-    emailAddress: "abc@example.com",
-    registrationDate: "2023-10-01",
-  },
-  {
-    id: 2,
-    businessName: "ABC Business",
-    userName: "James Anderson",
-    emailAddress: "abc@example.com",
-    registrationDate: "2023-10-01",
-  },
-];
+import { useSelector } from "react-redux";
+import { useGetBusinessProfilesQuery } from "../../redux/services/businessService";
 
 ModuleRegistry.registerModules([AllEnterpriseModule]);
 
 const UserManagement = () => {
   const navigate = useNavigate();
+  const { user } = useSelector((state: any) => state.auth);
+  const businessId = user?._id;
 
-  // const handleView = (id: number) => {
-  //     navigate(`/user-management/${id}`);
-  // };
+  const { data, isLoading, isError } = useGetBusinessProfilesQuery(
+    businessId!,
+    {
+      skip: !businessId,
+    }
+  );
 
+  console.log(data);
+
+  if (isLoading) return <>Loading...</>;
+  if (isError) return <>Failed to load profiles.</>;
 
   return (
     <>
@@ -60,7 +38,6 @@ const UserManagement = () => {
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="max-w-full overflow-x-auto py-4">
           <Table>
-            {/* Table Header */}
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell
@@ -79,7 +56,7 @@ const UserManagement = () => {
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  USER NAME
+                  BUSINESS TYPE
                 </TableCell>
                 <TableCell
                   isHeader
@@ -93,7 +70,10 @@ const UserManagement = () => {
                 >
                   EMAIL ADDRESS
                 </TableCell>
-                <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                >
                   Action
                 </TableCell>
               </TableRow>
@@ -101,8 +81,8 @@ const UserManagement = () => {
 
             {/* Table Body */}
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {tableData.map((user, index) => (
-                <TableRow key={user.id}>
+              {data?.data?.docs?.map((user: any, index: number) => (
+                <TableRow key={user._id || index}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
                     #{index + 1}
                   </TableCell>
@@ -110,23 +90,30 @@ const UserManagement = () => {
                     {user.businessName}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {user.userName}
+                    {user.businessType?.typeName}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {user.registrationDate}
+                    {new Date(user.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {user.emailAddress}
+                    {user.phoneNumber || "N/A"}
                   </TableCell>
-
-                  {/* New Action Column */}
                   <TableCell className="px-4 py-3 text-center">
                     <button
-                      onClick={() => navigate(`/business-management/${user.id}`)}
+                      onClick={() =>
+                        navigate(`/business-management/${user._id}`, {
+                          state: {
+                            user,
+                          },
+                        })
+                      }
                       className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10"
                       title="View Details"
                     >
-                      <Eye size={18} className="text-gray-600 dark:text-gray-300" />
+                      <Eye
+                        size={18}
+                        className="text-gray-600 dark:text-gray-300"
+                      />
                     </button>
                   </TableCell>
                 </TableRow>
@@ -136,13 +123,15 @@ const UserManagement = () => {
         </div>
 
         <div className="p-4">
-          <Pagination align="end" defaultCurrent={1} total={50} />
+          <Pagination
+            align="end"
+            defaultCurrent={1}
+            total={data?.data?.length || 0}
+          />
         </div>
       </div>
     </>
   );
 };
-
-
 
 export default UserManagement;

@@ -1,34 +1,46 @@
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import { UPLOADS_URL } from "../../constants/api";
-import { useUpdateProfileMutation } from "../../redux/services/userSlice";
+import { useEditProfileMutation } from "../../redux/services/userSlice";
 import UserAvatar from "./UserAvatar";
+import { ErrorPopup, SuccessPopup } from "../popup/Popup";
+import { useNavigate } from "react-router";
 
-export default function UserMetaCard() {
-  const { user } = useSelector((state: any) => state.auth);
-  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
-  const [showOverlay, setShowOverlay] = useState<boolean>(false);
+export default function UserMetaCard({ profile }: { profile: any }) {
+  const [editProfile, { isLoading }] = useEditProfileMutation();
+  const [showOverlay, setShowOverlay] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imgError, setImgError] = useState(false);
-
-  const handleChangeImage = () => {
-    fileInputRef.current?.click();
-  };
+  const navigate = useNavigate();
+  const handleChangeImage = () => fileInputRef.current?.click();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const file = e.target.files?.[0];
-      if (!file) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-      const formData = new FormData();
-      formData.append("image", file);
-      updateProfile(formData).unwrap();
-    } catch (error) {}
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      await editProfile(formData);
+      SuccessPopup(`Image updated successfully.`);
+      navigate(0);
+    } catch (err: any) {
+      ErrorPopup(`Failed to update image`);
+    }
   };
 
   const handleDeleteImage = async () => {
-    updateProfile({ deleteImage: true }).unwrap();
+    const formData = new FormData();
+    formData.append("image", "null");
+
+    try {
+      await editProfile(formData);
+      SuccessPopup(`Image deleted successfully.`);
+      navigate(0);
+    } catch (err: any) {
+      ErrorPopup(`Failed to delete image`);
+    }
   };
 
   return (
@@ -39,7 +51,7 @@ export default function UserMetaCard() {
         accept="image/*"
         className="hidden"
         onChange={handleFileChange}
-        disabled={isUpdating}
+        disabled={isLoading}
         onClick={(e) => ((e.target as HTMLInputElement).value = "")}
       />
 
@@ -48,19 +60,19 @@ export default function UserMetaCard() {
           <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
             <div
               className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800 relative group"
-              onClick={() => setShowOverlay((prev: boolean) => !prev)}
+              onClick={() => setShowOverlay((prev) => !prev)}
               onMouseEnter={() => setShowOverlay(true)}
               onMouseLeave={() => setShowOverlay(false)}
             >
-              {user?.image && !imgError ? (
+              {profile?.image && !imgError ? (
                 <img
-                  src={UPLOADS_URL + user.image}
+                  src={UPLOADS_URL + profile.image}
                   alt="user"
                   className="w-full h-full object-cover"
                   onError={() => setImgError(true)}
                 />
               ) : (
-                <UserAvatar fullName={user?.fullName} />
+                <UserAvatar fullName={profile?.fullName} />
               )}
 
               {showOverlay && (
@@ -76,14 +88,14 @@ export default function UserMetaCard() {
                     <PencilIcon className="w-5 h-5" />
                   </button>
 
-                  {user?.image && (
+                  {profile?.image && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteImage();
                       }}
                       className="text-white bg-red-600 p-1 rounded-full hover:bg-red-700"
-                      title="Delete Image"
+                      title="Remove Image"
                     >
                       <TrashIcon className="w-5 h-5" />
                     </button>
@@ -94,13 +106,11 @@ export default function UserMetaCard() {
 
             <div className="order-3 xl:order-2">
               <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
-                {user?.fullName}
+                {profile?.fullName}
               </h4>
-              <div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {user?.role}
-                </p>
-              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center xl:text-left">
+                {profile?.role}
+              </p>
             </div>
           </div>
         </div>

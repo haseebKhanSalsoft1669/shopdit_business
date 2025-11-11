@@ -7,7 +7,11 @@ import storage from "redux-persist/lib/storage";
 import { authService } from "./services/authSlice";
 import { userSlice } from "./services/userSlice";
 import { reportSlice } from "./services/reportSlice";
+import { businessService } from "./services/businessService"; // ✅ import new service
 import authReducer from "./slices/authSlice";
+import { eventService } from "./services/eventService";
+import { productService } from "./services/productService";
+import { customerService } from "./services/customerService";
 
 const persistConfig = {
   key: "shopdit_business",
@@ -19,6 +23,10 @@ const rootReducer = combineReducers({
   [authService.reducerPath]: authService.reducer,
   [userSlice.reducerPath]: userSlice.reducer,
   [reportSlice.reducerPath]: reportSlice.reducer,
+  [businessService.reducerPath]: businessService.reducer,
+  [eventService.reducerPath]: eventService.reducer,
+  [productService.reducerPath]: productService.reducer,
+  [customerService.reducerPath]: customerService.reducer,
   auth: authReducer,
 });
 
@@ -32,7 +40,11 @@ export const store = configureStore({
     }).concat(
       authService.middleware,
       userSlice.middleware,
-      reportSlice.middleware
+      reportSlice.middleware,
+      businessService.middleware,
+      eventService.middleware,
+      productService.middleware,
+      customerService.middleware
     ),
 });
 

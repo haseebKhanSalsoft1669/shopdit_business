@@ -4,60 +4,47 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import { useFormik } from "formik";
-import { SuccessPopup } from "../popup/Popup";
-import { useAppSelector } from "../../redux/hooks";
+import { SuccessPopup, ErrorPopup } from "../popup/Popup";
+import { useEditProfileMutation } from "../../redux/services/userSlice";
+import { useNavigate } from "react-router";
 
-const validate = (values: {
-  fullName: string;
-  email: string;
-  gender: string;
-}) => {
-  const errors: { fullName?: string; email?: string; gender?: string } = {};
-
-  if (!values.fullName) {
-    errors.fullName = "Required";
-  }
-
-  if (!values.email) {
-    errors.email = "Required";
-  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-    errors.email = "Invalid email address";
-  }
-
+const validate = (values: { fullName: string; gender: string }) => {
+  const errors: { fullName?: string; gender?: string } = {};
+  if (!values.fullName) errors.fullName = "Required";
   return errors;
 };
 
-export default function UserInfoCard() {
+export default function UserInfoCard({ profile }: { profile: any }) {
   const { isOpen, openModal, closeModal } = useModal();
-  const user = useAppSelector((state) => state.auth.user);
-
+  const [editProfile, { isLoading }] = useEditProfileMutation();
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
-      fullName: user?.fullName ?? "",
-      email: user?.email ?? "",
-      gender: user?.gender ?? "",
+      fullName: profile?.fullName ?? "",
+      gender: profile?.gender ?? "",
     },
     validate,
-    onSubmit: async () => {
+    onSubmit: async (values) => {
       try {
-        // Update profile API call here if needed
+        const formData = new FormData();
+        formData.append("fullName", values.fullName);
+        formData.append("gender", values.gender ?? "");
+
+        await editProfile(formData);
         SuccessPopup("Profile updated successfully!");
         closeModal();
-      } catch (error) {
-        console.error("Error updating profile:", error);
+        navigate(0);
+      } catch (err: any) {
+        ErrorPopup("Failed to update profile");
+        console.error(err);
       }
     },
   });
 
-  const formikError = (key: keyof typeof formik.errors) => (
-    <>
-      {formik.errors[key] && formik.touched[key] && (
-        <p className="mt-1 text-sm text-red-600">
-          {String(formik.errors[key])}
-        </p>
-      )}
-    </>
-  );
+  const formikError = (key: keyof typeof formik.errors) =>
+    formik.errors[key] && formik.touched[key] ? (
+      <p className="mt-1 text-sm text-red-600">{String(formik.errors[key])}</p>
+    ) : null;
 
   return (
     <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
@@ -72,7 +59,7 @@ export default function UserInfoCard() {
                 Full Name
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.fullName ?? "-"}
+                {profile?.fullName ?? "-"}
               </p>
             </div>
 
@@ -81,7 +68,7 @@ export default function UserInfoCard() {
                 Email address
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.email ?? "-"}
+                {profile?.email ?? "-"}
               </p>
             </div>
 
@@ -90,7 +77,7 @@ export default function UserInfoCard() {
                 Gender
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.gender ?? "-"}
+                {profile?.gender ?? "-"}
               </p>
             </div>
 
@@ -99,7 +86,7 @@ export default function UserInfoCard() {
                 Customer Id
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user?.customerId ?? "-"}
+                {profile?.customerId ?? "-"}
               </p>
             </div>
           </div>
@@ -144,19 +131,6 @@ export default function UserInfoCard() {
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="text"
-                      value={formik.values.email}
-                      onChange={formik.handleChange}
-                      disabled
-                    />
-                    {formikError("email")}
-                  </div>
-
-                  <div className="col-span-2 lg:col-span-1">
                     <Label htmlFor="gender">Gender</Label>
                     <Input
                       id="gender"
@@ -170,16 +144,22 @@ export default function UserInfoCard() {
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Customer Id</Label>
-                    <Input value={user?.customerId ?? "-"} disabled />
+                    <Input value={profile?.customerId ?? "-"} disabled />
+                  </div>
+
+                  <div className="col-span-2 lg:col-span-1">
+                    <Label>Email Address</Label>
+                    <Input value={profile?.email ?? "-"} disabled />
                   </div>
                 </div>
               </div>
             </div>
+
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
               <Button size="sm" variant="outline" onClick={closeModal}>
                 Close
               </Button>
-              <Button size="sm" type="submit">
+              <Button size="sm" type="submit" loading={isLoading}>
                 Save Changes
               </Button>
             </div>
