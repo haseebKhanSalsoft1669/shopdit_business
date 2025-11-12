@@ -12,6 +12,9 @@ import authReducer from "./slices/authSlice";
 import { eventService } from "./services/eventService";
 import { productService } from "./services/productService";
 import { customerService } from "./services/customerService";
+import { orderService } from "./services/orderService";
+import { campaignManagementService } from "./services/campaignsService";
+import { analyticsService } from "./services/dashboardAnalytics";
 
 const persistConfig = {
   key: "shopdit_business",
@@ -27,6 +30,9 @@ const rootReducer = combineReducers({
   [eventService.reducerPath]: eventService.reducer,
   [productService.reducerPath]: productService.reducer,
   [customerService.reducerPath]: customerService.reducer,
+  [orderService.reducerPath]: orderService.reducer,
+  [campaignManagementService.reducerPath]: campaignManagementService.reducer,
+  [analyticsService.reducerPath]: analyticsService.reducer,
   auth: authReducer,
 });
 
@@ -44,7 +50,10 @@ export const store = configureStore({
       businessService.middleware,
       eventService.middleware,
       productService.middleware,
-      customerService.middleware
+      customerService.middleware,
+      orderService.middleware,
+      campaignManagementService.middleware,
+      analyticsService.middleware
     ),
 });
 

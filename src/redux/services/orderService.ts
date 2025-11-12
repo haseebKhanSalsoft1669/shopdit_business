@@ -2,10 +2,10 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BASE_URL } from "../../constants/api";
 import { transformErrorResponse } from "./authSlice";
 
-export const eventService = createApi({
-  reducerPath: "eventService",
+export const orderService = createApi({
+  reducerPath: "orderService",
   baseQuery: fetchBaseQuery({
-    baseUrl: BASE_URL + "/event",
+    baseUrl: BASE_URL + "/order",
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as any).auth?.token;
@@ -13,15 +13,14 @@ export const eventService = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Events"],
+  tagTypes: ["Orders"],
   endpoints: (builder) => ({
-    getAllEvents: builder.query<any, { page?: number; limit?: number }>({
-      query: ({ page = 1, limit = 10 } = {}) =>
-        `/getAllEvents?page=${page}&limit=${limit}`,
-      providesTags: ["Events"],
+    getAllOrders: builder.query<any, { page: number; limit: number }>({
+      query: ({ page, limit }) => `/getAllOrders?page=${page}&limit=${limit}`,
+      providesTags: ["Orders"],
       transformErrorResponse,
     }),
   }),
 });
 
-export const { useGetAllEventsQuery } = eventService;
+export const { useGetAllOrdersQuery } = orderService;

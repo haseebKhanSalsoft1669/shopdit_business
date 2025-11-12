@@ -16,9 +16,12 @@ export const customerService = createApi({
   tagTypes: ["BusinessCustomers"],
   refetchOnMountOrArgChange: true,
   endpoints: (builder) => ({
-    getBusinessCustomers: builder.query<any, { businessProfileId: string }>({
-      query: ({ businessProfileId }) =>
-        `/getBusinessCustomers?businessProfileId=${businessProfileId}`,
+    getBusinessCustomers: builder.query<
+      any,
+      { businessProfileId: string; page: number; limit: number }
+    >({
+      query: ({ businessProfileId, page, limit }) =>
+        `/getBusinessCustomers?businessProfileId=${businessProfileId}&page=${page}&limit=${limit}`,
       providesTags: ["BusinessCustomers"],
       transformErrorResponse,
     }),

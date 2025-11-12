@@ -11,22 +11,41 @@ import {
 } from "../../components/ui/table";
 import { useSelector } from "react-redux";
 import { useGetBusinessCustomersQuery } from "../../redux/services/customerService";
+import usePagination from "../../utils/usePagination";
+import { useEffect } from "react";
 
 ModuleRegistry.registerModules([AllEnterpriseModule]);
 
 const Customer = () => {
   const navigate = useNavigate();
-
   const user = useSelector((state: any) => state.auth.user);
   const businessProfileId = user?.activeProfile;
 
-  const { data, isLoading } = useGetBusinessCustomersQuery(
-    { businessProfileId },
-    { skip: !businessProfileId }
-  );
-  console.log(data);
-  const tableData = data?.data?.customers || [];
-  console.log("tableData", tableData);
+  const { pageNumber, limit, totalDocs, handlePageChange, updateTotalDocs } =
+    usePagination(10);
+
+  const { data, isLoading, isFetching, isError, refetch } =
+    useGetBusinessCustomersQuery(
+      { businessProfileId, page: pageNumber, limit },
+      { skip: !businessProfileId }
+    );
+
+  // update total docs whenever data changes
+  useEffect(() => {
+    if (data?.data?.totalDocs) {
+      updateTotalDocs(data.data.totalDocs);
+    }
+  }, [data?.data?.totalDocs, updateTotalDocs]);
+
+  // refetch when page or limit changes
+  useEffect(() => {
+    refetch();
+  }, [pageNumber, limit, refetch]);
+
+  const tableData = isFetching ? [] : data?.data?.customers || [];
+
+  if (isLoading) return <p>Loading customers...</p>;
+  if (isError) return <p>Failed to load customers.</p>;
   return (
     <>
       <div className="mb-6 flex items-center justify-between">
@@ -137,7 +156,13 @@ const Customer = () => {
         </div>
 
         <div className="p-4">
-          <Pagination align="end" />
+          <Pagination
+            align="end"
+            current={pageNumber}
+            pageSize={limit}
+            total={totalDocs}
+            onChange={handlePageChange}
+          />
         </div>
       </div>
     </>

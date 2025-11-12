@@ -2,10 +2,10 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BASE_URL } from "../../constants/api";
 import { transformErrorResponse } from "./authSlice";
 
-export const eventService = createApi({
-  reducerPath: "eventService",
+export const analyticsService = createApi({
+  reducerPath: "analyticsService",
   baseQuery: fetchBaseQuery({
-    baseUrl: BASE_URL + "/event",
+    baseUrl: BASE_URL + "/analytics",
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as any).auth?.token;
@@ -13,15 +13,15 @@ export const eventService = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Events"],
+  tagTypes: ["Analytics"],
   endpoints: (builder) => ({
-    getAllEvents: builder.query<any, { page?: number; limit?: number }>({
-      query: ({ page = 1, limit = 10 } = {}) =>
-        `/getAllEvents?page=${page}&limit=${limit}`,
-      providesTags: ["Events"],
+    getBusinessAnalytics: builder.query<any, { businessProfileId: string }>({
+      query: ({ businessProfileId }) =>
+        `/?businessProfileId=${businessProfileId}`,
+      providesTags: ["Analytics"],
       transformErrorResponse,
     }),
   }),
 });
 
-export const { useGetAllEventsQuery } = eventService;
+export const { useGetBusinessAnalyticsQuery } = analyticsService;

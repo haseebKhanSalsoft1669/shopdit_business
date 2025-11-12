@@ -12,6 +12,8 @@ import { AllEnterpriseModule } from "ag-grid-enterprise";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useGetBusinessProfilesQuery } from "../../redux/services/businessService";
+import usePagination from "../../utils/usePagination";
+import { useEffect } from "react";
 
 ModuleRegistry.registerModules([AllEnterpriseModule]);
 
@@ -20,21 +22,26 @@ const UserManagement = () => {
   const { user } = useSelector((state: any) => state.auth);
   const businessId = user?._id;
 
-  const { data, isLoading, isError } = useGetBusinessProfilesQuery(
-    businessId!,
-    {
-      skip: !businessId,
-    }
+  const { pageNumber, limit, totalDocs, handlePageChange, updateTotalDocs } =
+    usePagination(10);
+  const { data, isLoading, isError, isFetching } = useGetBusinessProfilesQuery(
+    { businessId, page: pageNumber, limit },
+    { skip: !businessId }
   );
-
   console.log(data);
+  useEffect(() => {
+    if (data?.data?.totalDocs) {
+      updateTotalDocs(data.data.totalDocs);
+    }
+  }, [data?.data?.totalDocs, updateTotalDocs]);
 
   if (isLoading) return <>Loading...</>;
   if (isError) return <>Failed to load profiles.</>;
+  const profiles = isFetching ? [] : data?.data?.docs || [];
 
   return (
     <>
-      <h1 className="text-2xl font-bold">BUSINESS MANAGEMENT</h1>
+      <h1 className="text-2xl font-bold">Business Profiles</h1>
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="max-w-full overflow-x-auto py-4">
           <Table>
@@ -81,7 +88,7 @@ const UserManagement = () => {
 
             {/* Table Body */}
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {data?.data?.docs?.map((user: any, index: number) => (
+              {profiles?.map((user: any, index: number) => (
                 <TableRow key={user._id || index}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
                     #{index + 1}
@@ -125,8 +132,10 @@ const UserManagement = () => {
         <div className="p-4">
           <Pagination
             align="end"
-            defaultCurrent={1}
-            total={data?.data?.length || 0}
+            current={pageNumber}
+            pageSize={limit}
+            total={totalDocs}
+            onChange={handlePageChange}
           />
         </div>
       </div>

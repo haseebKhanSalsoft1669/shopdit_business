@@ -3,24 +3,51 @@ import { AllEnterpriseModule } from "ag-grid-enterprise";
 import { Button, Col, Pagination, Row } from "antd";
 import EventCard from "../../components/eventCard";
 import { useGetAllEventsQuery } from "../../redux/services/eventService";
+import usePagination from "../../utils/usePagination";
+import { useEffect } from "react";
 
 ModuleRegistry.registerModules([AllEnterpriseModule]);
 
 const Events = () => {
-  const { data: eventsData, isLoading } = useGetAllEventsQuery();
-  console.log(eventsData);
-  const products =
-    eventsData?.data?.docs?.map((event: any) => ({
-      image: event.image,
-      name: event.eventName,
-      amount: event.ticketPrice || 0,
-      date: event.date,
-    })) || [];
+  const { pageNumber, limit, totalDocs, handlePageChange, updateTotalDocs } =
+    usePagination(10); 
+
+  const {
+    data: eventsData,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useGetAllEventsQuery({ page: pageNumber, limit });
+
+  // update totalDocs whenever data changes
+  useEffect(() => {
+    if (eventsData?.data?.totalDocs) {
+      updateTotalDocs(eventsData.data.totalDocs);
+    }
+  }, [eventsData?.data?.totalDocs, updateTotalDocs]);
+
+  // refetch when page changes
+  useEffect(() => {
+    refetch();
+  }, [pageNumber, limit, refetch]);
+
+  const products = isFetching
+    ? []
+    : eventsData?.data?.docs?.map((event: any) => ({
+        image: event.image,
+        name: event.eventName,
+        amount: event.ticketPrice || 0,
+        date: event.date,
+      })) || [];
+
+  if (isLoading) return <p>Loading events...</p>;
+  if (isError) return <p>Failed to load events.</p>;
 
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold uppercase">Events</h1>
+        <h1 className="text-2xl font-bold capitalize">Events</h1>
         <Button className="web-btn">+ Add Event</Button>
       </div>
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -28,8 +55,8 @@ const Events = () => {
           <Row justify={"center"}>
             <Col xs={24} md={24} lg={24}>
               <Row gutter={20}>
-                {isLoading ? (
-                  <p className="text-center w-full">Loading events...</p>
+                {products.length === 0 ? (
+                  <p className="text-center w-full py-6">No events found</p>
                 ) : (
                   products.map((product: any, index: any) => (
                     <Col xs={24} sm={12} md={8} lg={6} key={index}>
@@ -49,7 +76,13 @@ const Events = () => {
         </div>
 
         <div className="p-4">
-          <Pagination align="end" />
+          <Pagination
+            align="end"
+            current={pageNumber}
+            pageSize={limit}
+            total={totalDocs}
+            onChange={handlePageChange}
+          />
         </div>
       </div>
     </>

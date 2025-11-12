@@ -1,5 +1,13 @@
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { Button, Input, InputNumber, Select, DatePicker, message, Upload } from "antd";
+import {
+  Button,
+  Input,
+  InputNumber,
+  Select,
+  DatePicker,
+  message,
+  Upload,
+} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { InboxOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
@@ -40,7 +48,9 @@ const AddProduct = () => {
       {/* Form Container */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="max-w-full overflow-x-auto p-4">
-          <h2 className="text-2xl font-semibold dark:text-white">Product Details</h2>
+          <h2 className="text-2xl font-semibold dark:text-white">
+            Product Details
+          </h2>
 
           <div className="mt-6 md:w-2/4">
             <form>
@@ -72,10 +82,14 @@ const AddProduct = () => {
                       allowClear
                       bordered={false}
                     >
-                      <Select.Option value="Electronics">Electronics</Select.Option>
+                      <Select.Option value="Electronics">
+                        Electronics
+                      </Select.Option>
                       <Select.Option value="Wearables">Wearables</Select.Option>
                       <Select.Option value="Audio">Audio</Select.Option>
-                      <Select.Option value="Accessories">Accessories</Select.Option>
+                      <Select.Option value="Accessories">
+                        Accessories
+                      </Select.Option>
                     </Select>
                   </div>
                 </div>
@@ -134,7 +148,9 @@ const AddProduct = () => {
                     >
                       <Select.Option value="Active">Active</Select.Option>
                       <Select.Option value="Inactive">Inactive</Select.Option>
-                      <Select.Option value="Out of Stock">Out of Stock</Select.Option>
+                      <Select.Option value="Out of Stock">
+                        Out of Stock
+                      </Select.Option>
                     </Select>
                   </div>
                 </div>
@@ -156,7 +172,8 @@ const AddProduct = () => {
                 {/* Upload Product Image */}
                 <div>
                   <Label className="font-semibold !text-black dark:!text-white">
-                    Upload Product Image <span className="text-error-500">*</span>
+                    Upload Product Image{" "}
+                    <span className="text-error-500">*</span>
                   </Label>
                   <Dragger
                     {...uploadProps}

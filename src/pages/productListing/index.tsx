@@ -11,6 +11,8 @@ import { ModuleRegistry } from "ag-grid-community";
 import { AllEnterpriseModule } from "ag-grid-enterprise";
 import { useSelector } from "react-redux";
 import { useGetBusinessProductsQuery } from "../../redux/services/productService";
+import usePagination from "../../utils/usePagination";
+import { useEffect } from "react";
 
 ModuleRegistry.registerModules([AllEnterpriseModule]);
 
@@ -18,14 +20,26 @@ const ProductListing = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state: any) => state.auth);
   const businessProfileId = user?.activeProfile;
-  const { data, isLoading, error } = useGetBusinessProductsQuery({
+
+  const { pageNumber, limit, totalDocs, handlePageChange, updateTotalDocs } =
+    usePagination(10);
+
+  const { data, isLoading, isFetching, isError } = useGetBusinessProductsQuery({
     businessProfileId,
+    page: pageNumber,
+    limit,
   });
 
-  if (isLoading) return <>Loading...</>;
-  if (error) return <>Failed to load products</>;
-  console.log(data);
-  const products = data?.data?.docs || []; // assuming your API returns { data: [...] }
+  const products = isFetching ? [] : data?.data?.docs || [];
+
+  useEffect(() => {
+    if (data?.data?.totalDocs) {
+      updateTotalDocs(data.data.totalDocs);
+    }
+  }, [data?.data?.totalDocs, updateTotalDocs]);
+
+  if (isLoading) return <p>Loading products...</p>;
+  if (isError) return <p>Failed to load products.</p>;
 
   return (
     <>
@@ -42,80 +56,87 @@ const ProductListing = () => {
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="max-w-full overflow-x-auto py-4">
-          <Table>
-            {/* Table Header */}
-            <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-              <TableRow>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                >
-                  S.No
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                >
-                  Product Name
-                </TableCell>
-
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                >
-                  Price
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                >
-                  Description
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                >
-                  Reward Points
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                >
-                  Added On
-                </TableCell>
-              </TableRow>
-            </TableHeader>
-
-            {/* Table Body */}
-            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {products.map((product: any, index: number) => (
-                <TableRow key={product.id || index}>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start">
-                    #{index + 1}
+          {isFetching ? (
+            <p className="text-center py-6">Loading...</p>
+          ) : (
+            <Table>
+              <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                <TableRow>
+                  <TableCell
+                    isHeader
+                    className="px-5 py-3 text-start text-gray-500"
+                  >
+                    S.No
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {product.productName}
+                  <TableCell
+                    isHeader
+                    className="px-5 py-3 text-start text-gray-500"
+                  >
+                    Product Name
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {product.price}
+                  <TableCell
+                    isHeader
+                    className="px-5 py-3 text-start text-gray-500"
+                  >
+                    Price
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {product.description}
+                  <TableCell
+                    isHeader
+                    className="px-5 py-3 text-start text-gray-500"
+                  >
+                    Description
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {product.rewardPoints}
+                  <TableCell
+                    isHeader
+                    className="px-5 py-3 text-start text-gray-500"
+                  >
+                    Reward Points
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-700 text-start text-theme-sm">
-                    {new Date(product.createdAt).toLocaleDateString() || "-"}
+                  <TableCell
+                    isHeader
+                    className="px-5 py-3 text-start text-gray-500"
+                  >
+                    Added On
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+
+              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                {products.map((product: any, index: number) => (
+                  <TableRow key={product._id || index}>
+                    <TableCell className="px-5 py-4 text-start">
+                      #{(pageNumber - 1) * limit + index + 1}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-700 text-start">
+                      {product.productName}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-700 text-start">
+                      {product.price}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-700 text-start">
+                      {product.description || "-"}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-700 text-start">
+                      {product.rewardPoints || 0}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-700 text-start">
+                      {new Date(product.createdAt).toLocaleDateString() || "-"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </div>
 
         <div className="p-4">
-          <Pagination align="end" defaultCurrent={1} total={products.length} />
+          <Pagination
+            align="end"
+            current={pageNumber}
+            total={totalDocs}
+            pageSize={limit}
+            onChange={handlePageChange}
+          />
         </div>
       </div>
     </>

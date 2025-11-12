@@ -17,8 +17,12 @@ export const businessService = createApi({
   refetchOnMountOrArgChange: true,
 
   endpoints: (builder) => ({
-    getBusinessProfiles: builder.query<any, string>({
-      query: (businessId: string) => `/${businessId}/profiles`,
+    getBusinessProfiles: builder.query<
+      any,
+      { businessId: string; page: number; limit: number }
+    >({
+      query: ({ businessId, page, limit }) =>
+        `/${businessId}/profiles?page=${page}&limit=${limit}`,
       providesTags: ["BusinessProfiles"],
       transformErrorResponse,
     }),

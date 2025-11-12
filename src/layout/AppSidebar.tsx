@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router";
 import { ImageUrl } from "../utils/Functions";
 // Assume these icons are imported from an icon library
 import { BiSolidChart } from "react-icons/bi";
-import { FaHandshake } from "react-icons/fa6";
 import { IoIosBriefcase } from "react-icons/io";
 import { MdOutlineCampaign } from "react-icons/md";
 import { useSidebar } from "../context/SidebarContext";
@@ -51,7 +50,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <IoIosBriefcase />,
-    name: "Events And Add Event",
+    name: "Events",
     path: "/events",
   },
   {
@@ -61,7 +60,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <List />,
-    name: "Product Listing",
+    name: "Products",
     path: "/product-listing",
   },
 
