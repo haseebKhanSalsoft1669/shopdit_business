@@ -1,20 +1,9 @@
-import { useSelector } from "react-redux";
 import PageMeta from "../../components/common/PageMeta";
 import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
 import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
 import StatisticsChart from "../../components/ecommerce/StatisticsChart";
-import { useGetBusinessAnalyticsQuery } from "../../redux/services/dashboardAnalytics";
 
 export default function Home() {
-  const { user } = useSelector((state: any) => state.auth);
-  const businessProfileId = user?.activeProfile;
-
-  const { data, isLoading, isError } = useGetBusinessAnalyticsQuery(
-    { businessProfileId },
-    { skip: !businessProfileId }
-  );
-  
-  console.log("Analytics Data:", data);
   return (
     <>
       <PageMeta
